@@ -18,7 +18,7 @@ export const Character: React.FC<CharacterProps> = ({ position, path = [], isMov
   const SPEED = 2.5;
   const CAMERA_LERP_FACTOR = 0.05; // Smooth camera follow
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (!meshRef.current) return;
 
     // Movement Logic

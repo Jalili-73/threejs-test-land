@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { Environment, OrbitControls } from '@react-three/drei';
 import { LoadedModel } from '../components/LoadedModel';
 import { Character } from '../components/Character';

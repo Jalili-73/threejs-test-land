@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { Loader } from '@react-three/drei';
 import * as THREE from 'three';
 import { MainScene } from '../scenes/MainScene';
 
@@ -18,7 +18,9 @@ export const ThreeCanvas: React.FC = () => {
         style={{ width: '100%', height: '100%' }}
       >
         <color attach="background" args={['#1a1a2e']} />
-        <MainScene />
+        <Suspense fallback={null}>
+          <MainScene />
+        </Suspense>
         {/* <OrbitControls 
           enablePan={true} 
           enableZoom={true} 
@@ -27,6 +29,7 @@ export const ThreeCanvas: React.FC = () => {
           maxDistance={20}
         /> */}
       </Canvas>
+      <Loader />
     </div>
   );
 };
