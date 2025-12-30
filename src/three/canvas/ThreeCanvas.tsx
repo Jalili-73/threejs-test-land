@@ -14,18 +14,18 @@ export const ThreeCanvas: React.FC = () => {
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0,
         }}
-        camera={{ position: [5, 5, 5], fov: 50 }}
+        camera={{ position: [0, 5, 10], fov: 50 }}
         style={{ width: '100%', height: '100%' }}
       >
         <color attach="background" args={['#1a1a2e']} />
         <MainScene />
-        <OrbitControls 
+        {/* <OrbitControls 
           enablePan={true} 
           enableZoom={true} 
           enableRotate={true}
           minDistance={2}
           maxDistance={20}
-        />
+        /> */}
       </Canvas>
     </div>
   );
