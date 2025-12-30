@@ -69,6 +69,11 @@ export const LoadedModel: React.FC<LoadedModelProps> = ({
       object={gltf.scene} 
       position={position} 
       scale={scale} 
+      onClick={(e: any) => {
+        e.stopPropagation();
+        const { x, y, z } = e.point;
+        console.log(`%c Clicked Position: [${x.toFixed(3)}, ${y.toFixed(3)}, ${z.toFixed(3)}]`, 'background: #222; color: #bada55; padding: 4px; border-radius: 2px');
+      }}
     />
   );
 };

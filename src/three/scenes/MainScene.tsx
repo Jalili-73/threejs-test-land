@@ -2,6 +2,7 @@ import React from 'react';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { Environment } from '@react-three/drei';
 import { LoadedModel } from '../components/LoadedModel';
+import { Character } from '../components/Character';
 
 export const MainScene: React.FC = () => {
   return (
@@ -16,6 +17,9 @@ export const MainScene: React.FC = () => {
 
       {/* 3D Model */}
       <LoadedModel position={[0, 0, 0]} />
+
+      {/* Character */}
+      <Character position={[-8.535, -1.426 + 0.25, -1.835]} />
       
       {/* Post Processing - Temporarily Disabled for Debugging */}
       {/* <EffectComposer>
