@@ -1,5 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { useAnimations } from '@react-three/drei';
+import { useGltf } from '../loaders/useGltf';
 import * as THREE from 'three';
 
 interface CharacterProps {
@@ -10,22 +12,68 @@ interface CharacterProps {
 }
 
 export const Character: React.FC<CharacterProps> = ({ position, path = [], isMoving = false, onFinish }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
+  const { scene, animations } = useGltf('/models/character.glb');
+  const { actions } = useAnimations(animations, groupRef);
   
   // State to track progress along the path
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
   const SPEED = 2.5;
   const CAMERA_LERP_FACTOR = 0.05; // Smooth camera follow
 
+  useEffect(() => {
+    // Traverse and enable shadows on all meshes in the GLB
+    scene.traverse((o) => {
+      if ((o as any).isMesh) {
+        o.castShadow = true;
+        o.receiveShadow = true;
+      }
+    });
+    
+    // Simple manual scale fallback
+    // If the auto-scaler is breaking the rig, let's just use a fixed safe scale
+    // Try 0.5 first, if it's too big/small we can adjust
+    scene.scale.set(0.5, 0.5, 0.5);
+    
+    // Rotate the model 90 degrees around Y-axis if needed
+    scene.rotation.y = Math.PI / 2;
+    
+  }, [scene]);
+
+  useEffect(() => {
+    // Animation logic
+    // Log available animations to find the correct names
+    console.log('Available animations:', Object.keys(actions));
+    
+    // Try to find animations even if names are slightly different (case-insensitive)
+    const runKey = Object.keys(actions).find(key => key.toLowerCase().includes('run')) || 'Run';
+    const idleKey = Object.keys(actions).find(key => key.toLowerCase().includes('idle')) || 'Idle';
+    
+    const runAction = actions[runKey];
+    const idleAction = actions[idleKey];
+
+    if (isMoving) {
+      idleAction?.fadeOut(0.2);
+      runAction?.reset().fadeIn(0.2).play();
+    } else {
+      runAction?.fadeOut(0.2);
+      idleAction?.reset().fadeIn(0.2).play();
+    }
+
+    return () => {
+      // Cleanup if needed, though fading handles transitions
+    };
+  }, [isMoving, actions]);
+
   useFrame((_, delta) => {
-    if (!meshRef.current) return;
+    if (!groupRef.current) return;
 
     // Movement Logic
     if (isMoving && path.length > 0) {
       if (currentPathIndex < path.length) {
         const target = path[currentPathIndex];
-        const currentPos = meshRef.current.position;
+        const currentPos = groupRef.current.position;
         
         const direction = new THREE.Vector3().subVectors(target, currentPos);
         const distance = direction.length();
@@ -35,17 +83,17 @@ export const Character: React.FC<CharacterProps> = ({ position, path = [], isMov
           
           // Move character
           const moveAmount = Math.min(SPEED * delta, distance);
-          meshRef.current.position.add(direction.multiplyScalar(moveAmount));
+          groupRef.current.position.add(direction.multiplyScalar(moveAmount));
           
           // Face target
-          meshRef.current.lookAt(target);
+          groupRef.current.lookAt(target);
           
           // Camera Follow Logic (Only when moving)
-          const characterPos = meshRef.current.position;
+          const characterPos = groupRef.current.position;
           
           // Calculate ideal camera position (behind character)
           const forward = new THREE.Vector3(0, 0, 1);
-          forward.applyQuaternion(meshRef.current.quaternion);
+          forward.applyQuaternion(groupRef.current.quaternion);
           forward.normalize();
           
           // Place camera behind: Position - (Forward * Distance) + Height
@@ -70,9 +118,8 @@ export const Character: React.FC<CharacterProps> = ({ position, path = [], isMov
   });
 
   return (
-    <mesh ref={meshRef} position={position} castShadow receiveShadow>
-      <boxGeometry args={[0.5, 0.5, 0.5]} />
-      <meshStandardMaterial color="#ff4444" />
-    </mesh>
+    <group ref={groupRef} position={position} dispose={null}>
+      <primitive object={scene} />
+    </group>
   );
 };

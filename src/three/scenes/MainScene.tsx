@@ -10,9 +10,9 @@ export const MainScene: React.FC = () => {
   const [hasFinishedPath, setHasFinishedPath] = useState(false);
 
   const characterPath = useMemo(() => [
-    new THREE.Vector3(-6.061, -1.426 + 0.25, -1.732),
-    new THREE.Vector3(-6.076, -1.426 + 0.25, 0.795),
-    new THREE.Vector3(-1.974, -1.426 + 0.25, 0.909)
+    new THREE.Vector3(-6.061, -1.426, -1.732),
+    new THREE.Vector3(-6.076, -1.426, 0.795),
+    new THREE.Vector3(-1.974, -1.426, 0.909)
   ], []);
 
   const handleFinishPath = () => {
@@ -39,7 +39,7 @@ export const MainScene: React.FC = () => {
           enableRotate={true}
           minDistance={2}
           maxDistance={20}
-          target={hasFinishedPath ? [-1.974, -1.426 + 0.25, 0.909] : [0, 0, 0]}
+          target={hasFinishedPath ? [-1.974, -1.426, 0.909] : [0, 0, 0]}
         />
       )}
 
@@ -57,7 +57,7 @@ export const MainScene: React.FC = () => {
 
       {/* Character */}
       <Character 
-        position={[-8.535, -1.426 + 0.25, -1.835]} 
+        position={[-8.535, -1.426, -1.835]} 
         path={characterPath}
         isMoving={isCharacterMoving}
         onFinish={handleFinishPath}
